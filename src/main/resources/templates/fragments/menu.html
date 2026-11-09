@@ -1,13 +1,13 @@
-
 <nav th:fragment="menu"
      xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
      class="navbar navbar-expand-lg bg-dark navbar-dark">
 
     <div class="container">
 
         <!-- LOGOTIPO -->
         <a class="navbar-brand" th:href="@{/}">
-           SAEP
+            SAEP
         </a>
 
         <!-- BOTÃO MOBILE -->
@@ -26,7 +26,7 @@
             <!-- MENU PRINCIPAL -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                <!-- PÚBLICO -->
+                <!-- PÁGINAS PÚBLICAS -->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/}">
                         Início
@@ -39,16 +39,28 @@
                     </a>
                 </li>
 
-                <!-- SOMENTE AUTENTICADOS -->
+                <!-- ADMINISTRADOR -->
                 <li class="nav-item"
-                    th:if="${session.autenticado == true}">
+                    sec:authorize="hasRole('ADMIN')">
+
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        Dashboard
+                    </a>
+                </li>
+
+                <!-- ADMINISTRADOR E FUNCIONÁRIO -->
+                <li class="nav-item"
+                    sec:authorize="hasAnyRole('ADMIN', 'FUNCIONARIO')">
+
                     <a class="nav-link" th:href="@{/clientes}">
                         Clientes
                     </a>
                 </li>
 
+                <!-- USUÁRIOS AUTENTICADOS -->
                 <li class="nav-item"
-                    th:if="${session.autenticado == true}">
+                    sec:authorize="isAuthenticated()">
+
                     <a class="nav-link" th:href="@{/agendamentos}">
                         Agendamentos
                     </a>
@@ -56,8 +68,8 @@
 
             </ul>
 
-            <!-- USUÁRIO NÃO LOGADO -->
-            <div th:if="${session.autenticado != true}">
+            <!-- USUÁRIO NÃO AUTENTICADO -->
+            <div sec:authorize="!isAuthenticated()">
 
                 <a class="btn btn-outline-light btn-sm"
                    th:href="@{/login}">
@@ -66,8 +78,8 @@
 
             </div>
 
-            <!-- USUÁRIO LOGADO -->
-            <div th:if="${session.autenticado == true}"
+            <!-- USUÁRIO AUTENTICADO -->
+            <div sec:authorize="isAuthenticated()"
                  class="dropdown">
 
                 <button class="btn btn-outline-light dropdown-toggle"
@@ -85,16 +97,19 @@
 
                 <ul class="dropdown-menu dropdown-menu-end"
                     aria-labelledby="menuUsuario">
-                    <!-- PAINEL DO CLIENTE -->
-                    <li class="nav-item"
-                        th:if="${session.perfil != null and session.perfil.name() == 'CLIENTE'}">
 
-                        <a class="nav-link" th:href="@{/cliente/painel}">
+                    <!-- PAINEL DO CLIENTE -->
+                    <li sec:authorize="hasRole('CLIENTE')">
+
+                        <a class="dropdown-item"
+                           th:href="@{/cliente/painel}">
                             Meu Painel
                         </a>
 
                     </li>
-                    <li th:if="${session.perfil != null and session.perfil.name() == 'CLIENTE'}">
+
+                    <!-- NOVO AGENDAMENTO -->
+                    <li sec:authorize="hasRole('CLIENTE')">
 
                         <a class="dropdown-item"
                            th:href="@{/agendamentos/novo}">
@@ -102,7 +117,9 @@
                         </a>
 
                     </li>
-                    <li th:if="${session.perfil != null  and session.perfil.name() == 'CLIENTE'}">
+
+                    <!-- EDITAR DADOS DO CLIENTE -->
+                    <li sec:authorize="hasRole('CLIENTE')">
 
                         <a class="dropdown-item"
                            th:href="@{/cliente/perfil}">
@@ -111,6 +128,27 @@
 
                     </li>
 
+                    <!-- ÁREA ADMINISTRATIVA -->
+                    <li sec:authorize="hasRole('ADMIN')">
+
+                        <a class="dropdown-item"
+                           th:href="@{/dashboard}">
+                            Administração
+                        </a>
+
+                    </li>
+
+                    <!-- ÁREA DO FUNCIONÁRIO -->
+                    <li sec:authorize="hasRole('FUNCIONARIO')">
+
+                        <a class="dropdown-item"
+                           th:href="@{/admin/funcionarios/}">
+                            Painel do funcionário
+                        </a>
+
+                    </li>
+
+                    <!-- OPÇÕES GERAIS -->
                     <li>
                         <a class="dropdown-item"
                            th:href="@{/perfil/editar}">
@@ -129,11 +167,17 @@
                         <hr class="dropdown-divider">
                     </li>
 
+                    <!-- LOGOUT COM POST -->
                     <li>
-                        <a class="dropdown-item text-danger"
-                           th:href="@{/logout}">
-                            Sair do sistema
-                        </a>
+                        <form th:action="@{/logout}"
+                              method="post">
+
+                            <button type="submit"
+                                    class="dropdown-item text-danger">
+                                Sair do sistema
+                            </button>
+
+                        </form>
                     </li>
 
                 </ul>
