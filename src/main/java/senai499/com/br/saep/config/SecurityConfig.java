@@ -48,7 +48,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/admin/funcionarios/**")
                         .hasAnyRole("ADMIN", "FUNCIONARIO")
-
+                        .requestMatchers("/perfil/alterar-senha")
+                        .authenticated()
                         // Demais rotas protegidas
                         .anyRequest().authenticated()
                 )

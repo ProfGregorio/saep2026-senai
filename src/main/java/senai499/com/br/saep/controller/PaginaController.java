@@ -1,7 +1,10 @@
 package senai499.com.br.saep.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import senai499.com.br.saep.dto.CadastroClienteForm;
 
 @Controller
 public class PaginaController {
@@ -10,6 +13,7 @@ public class PaginaController {
     public String home() {
         return "index";
     }
+
     @GetMapping("/sobre")
     public String sobre() {
         return "sobre";
@@ -21,7 +25,13 @@ public class PaginaController {
     }
 
     @GetMapping("/cadastro")
-    public String cadastro() {
+    public String cadastro(Model model) {
+
+        model.addAttribute(
+                "form",
+                new CadastroClienteForm()
+        );
+
         return "cadastro";
     }
 }
